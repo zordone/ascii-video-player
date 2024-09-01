@@ -3,10 +3,11 @@ body {
   background: #222;
   color: #ddd;
   font-family: sans-serif;
+  margin: 0;
 }
 
 body {
-  margin: 1rem;
+  padding: 1rem;
 }
 
 canvas {
@@ -20,7 +21,6 @@ canvas {
   margin-bottom: 1rem;
 
   > * {
-    --aspect-ratio: 16/9;
     width: 100%;
   }
 
@@ -30,7 +30,6 @@ canvas {
   }
 
   #params {
-    ---grid-column: span 2;
     display: flex;
     flex-direction: column;
     justify-content: end;
@@ -52,7 +51,7 @@ canvas {
   width: 100%;
   height: 100%;
   opacity: 0;
-  ---transition: opacity 1s ease-in-out;
+  transition: opacity 100ms ease-in-out;
 }
 
 #output-text {

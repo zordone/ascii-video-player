@@ -18,129 +18,129 @@ const filter = {
     0.6561, 0.6595, 0.6631, 0.6714, 0.6759, 0.6809, 0.6816, 0.6925, 0.7039,
     0.7086, 0.7235, 0.7302, 0.7332, 0.7602, 0.7834, 0.8037, 0.9999,
   ],
-};
 
-filter.init = function doLoad() {
-  const video = document.getElementById("video");
-  video.muted = true;
-  this.video = video;
+  init() {
+    const video = document.getElementById("video");
+    video.muted = true;
+    this.video = video;
 
-  this.c1 = document.getElementById("c1");
-  this.ctx1 = this.c1.getContext("2d", { willReadFrequently: true });
+    this.pixelatedCanvas = document.getElementById("pixelated");
+    this.pixelatedCtx = this.pixelatedCanvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
-  this.c2 = document.getElementById("c2");
-  this.ctx2 = this.c2.getContext("2d");
+    this.luminosityCanvas = document.getElementById("luminosity");
+    this.luminosityCtx = this.luminosityCanvas.getContext("2d");
 
-  this.outputColor = document.getElementById("output-color");
-  this.outputColorCtx = this.outputColor.getContext("2d");
+    this.colorCanvas = document.getElementById("output-color");
+    this.colorCtx = this.colorCanvas.getContext("2d");
 
-  document.getElementById("color").addEventListener(
-    "change",
-    (event) => {
-      this.outputColor.style.opacity = event.target.checked ? 1 : 0;
-    },
-    false
-  );
+    document.getElementById("color").addEventListener(
+      "change",
+      (event) => {
+        this.colorCanvas.style.opacity = event.target.checked ? 1 : 0;
+      },
+      false
+    );
 
-  document.getElementById("fullscreen").addEventListener(
-    "click",
-    (event) => {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        document.body.requestFullscreen();
-      }
-    },
-    false
-  );
+    document.getElementById("fullscreen").addEventListener(
+      "click",
+      (event) => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.body.requestFullscreen();
+        }
+      },
+      false
+    );
 
-  this.outputText = document.getElementById("output-text");
+    this.outputText = document.getElementById("output-text");
 
-  video.addEventListener(
-    "play",
-    () => {
+    video.addEventListener("loadeddata", () => {
       this.width = Math.round(video.videoWidth / this.pixelateX);
       this.height = Math.round(video.videoHeight / this.pixelateY);
 
-      this.c1.width = this.width;
-      this.c1.height = this.height;
-      this.c2.width = this.width;
-      this.c2.height = this.height;
-      this.outputColor.width = this.width;
-      this.outputColor.height = this.height;
+      this.pixelatedCanvas.width = this.width;
+      this.pixelatedCanvas.height = this.height;
+      this.luminosityCanvas.width = this.width;
+      this.luminosityCanvas.height = this.height;
+      this.colorCanvas.width = this.width;
+      this.colorCanvas.height = this.height;
       console.log(`Pixelated to ${this.width} x ${this.height}`);
 
       this.timerCallback();
-    },
-    false
-  );
+    });
 
-  video.addEventListener(
-    "seeked",
-    () => {
-      if (this.video.paused) this.computeFrame();
-    },
-    false
-  );
-};
+    video.addEventListener("play", () => this.timerCallback(), false);
 
-filter.timerCallback = function timerCallback() {
-  if (this.video.paused || this.video.ended) {
-    return;
-  }
+    video.addEventListener(
+      "seeked",
+      () => {
+        if (this.video.paused) this.computeFrame();
+      },
+      false
+    );
+  },
 
-  this.computeFrame();
+  timerCallback() {
+    if (this.video.paused || this.video.ended) {
+      return;
+    }
 
-  this.video.requestVideoFrameCallback(() => this.timerCallback());
-};
+    this.computeFrame();
 
-// gamma encoded sRGB -> linear luminance
-const gammaCorrect = (value) => {
-  if (value <= 0.04045) return value / 12.92;
-  return Math.pow((value + 0.055) / 1.055, 2.4);
-};
+    this.video.requestVideoFrameCallback(() => this.timerCallback());
+  },
 
-filter.computeFrame = function computeFrame() {
-  this.ctx1.drawImage(this.video, 0, 0, this.width, this.height);
-  const frame = this.ctx1.getImageData(0, 0, this.width, this.height);
-  const data = frame.data;
+  // gamma encoded sRGB -> linear luminance
+  gammaCorrect(value) {
+    if (value <= 0.04045) return value / 12.92;
+    return Math.pow((value + 0.055) / 1.055, 2.4);
+  },
 
-  this.outputColorCtx.putImageData(frame, 0, 0);
+  computeFrame() {
+    this.pixelatedCtx.drawImage(this.video, 0, 0, this.width, this.height);
+    const frame = this.pixelatedCtx.getImageData(0, 0, this.width, this.height);
+    const data = frame.data;
 
-  let output = "";
-  for (let i = 0; i < data.length; i += 4) {
-    const r = gammaCorrect(data[i + 0] / 255);
-    const g = gammaCorrect(data[i + 1] / 255);
-    const b = gammaCorrect(data[i + 2] / 255);
+    this.colorCtx.putImageData(frame, 0, 0);
 
-    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    const scaled = luminance * 255;
-    data[i + 0] = scaled;
-    data[i + 1] = scaled;
-    data[i + 2] = scaled;
+    let output = "";
+    for (let i = 0; i < data.length; i += 4) {
+      const r = this.gammaCorrect(data[i + 0] / 255);
+      const g = this.gammaCorrect(data[i + 1] / 255);
+      const b = this.gammaCorrect(data[i + 2] / 255);
 
-    const scaledValue = scaled / 255;
-    let closestChar = "";
-    let closestDiff = Infinity;
-    for (let v = 0; v < this.asciiValues.length; v += 1) {
-      const diff = Math.abs(this.asciiValues[v] - scaledValue);
-      if (diff < closestDiff) {
-        closestDiff = diff;
-        closestChar = this.asciiChars[v];
-      } else if (diff > closestDiff) {
-        break;
+      const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      const scaled = luminance * 255;
+      data[i + 0] = scaled;
+      data[i + 1] = scaled;
+      data[i + 2] = scaled;
+
+      const scaledValue = scaled / 255;
+      let closestChar = "";
+      let closestDiff = Infinity;
+      for (let v = 0; v < this.asciiValues.length; v += 1) {
+        const diff = Math.abs(this.asciiValues[v] - scaledValue);
+        if (diff < closestDiff) {
+          closestDiff = diff;
+          closestChar = this.asciiChars[v];
+        } else if (diff > closestDiff) {
+          break;
+        }
+        // TODO: binary search?
       }
-      // TODO: binary search?
+
+      output += closestChar;
+      if ((i / 4 + 1) % this.width === 0) {
+        output += "\n";
+      }
     }
 
-    output += closestChar;
-    if ((i / 4 + 1) % this.width === 0) {
-      output += "\n";
-    }
-  }
-
-  this.ctx2.putImageData(frame, 0, 0);
-  this.outputText.innerText = output;
+    this.luminosityCtx.putImageData(frame, 0, 0);
+    this.outputText.innerText = output;
+  },
 };
 
 filter.init();
