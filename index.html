@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ASCII Video Player</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div id="grid">
+      <video
+        id="video"
+        src="video/BigBuckBunny.mp4"
+        controls
+        crossorigin="anonymous"
+        autofocus
+      ></video>
+      <canvas id="c1"></canvas>
+      <canvas id="c2"></canvas>
+      <div id="params">
+        <input id="color" type="checkbox">Color</div>
+      </div>
+    </div>
+
+    <div id="output-container">
+      <div id="output-color">
+        <canvas id="c3"></canvas>
+      </div>
+      <div id="output-text"></div>
+    </div>
+
+    <script src="filter.js"></script>
+  </body>
+</html>
