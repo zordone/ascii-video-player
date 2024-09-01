@@ -30,7 +30,12 @@ canvas {
   }
 
   #params {
-    grid-column: span 2;
+    ---grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    gap: 1rem;
+    width: fit-content;
   }
 }
 
@@ -38,28 +43,23 @@ canvas {
   display: inline-block;
   position: relative;
   font-size: 0;
+  background-color: #fff;
 }
 
 #output-color {
   position: absolute;
   inset: 0;
-  background-color: #fff;
-
-  canvas {
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-  }
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  ---transition: opacity 1s ease-in-out;
 }
 
 #output-text {
   display: inline-block;
   position: relative;
   mix-blend-mode: multiply;
-  --margin: 0 auto;
   font: 900 6px "Courier", monospace;
-  --aspect-ratio: 16/9;
   white-space: preserve nowrap;
   line-height: 1.06;
   background: #000;

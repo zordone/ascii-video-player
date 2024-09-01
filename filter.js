@@ -1,10 +1,11 @@
-const processor = {
+const filter = {
   // size of one pixel
-  pixelateX: 3.6,
-  pixelateY: 3.6 * (16 / 9),
-  // asci characters to use
+  pixelateX: 3.5,
+  pixelateY: 3.5 * (16 / 9),
+  // ascii characters to use
   asciiChars:
     " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@",
+  // luminosity value for each character
   asciiValues: [
     0, 0.0751, 0.0829, 0.0848, 0.1227, 0.1403, 0.1559, 0.185, 0.2183, 0.2417,
     0.2571, 0.2852, 0.2902, 0.2919, 0.3099, 0.3192, 0.3232, 0.3294, 0.3384,
@@ -19,7 +20,7 @@ const processor = {
   ],
 };
 
-processor.doLoad = function doLoad() {
+filter.init = function doLoad() {
   const video = document.getElementById("video");
   video.muted = true;
   this.video = video;
@@ -30,14 +31,30 @@ processor.doLoad = function doLoad() {
   this.c2 = document.getElementById("c2");
   this.ctx2 = this.c2.getContext("2d");
 
-  this.c3 = document.getElementById("c3");
-  this.ctx3 = this.c3.getContext("2d");
+  this.outputColor = document.getElementById("output-color");
+  this.outputColorCtx = this.outputColor.getContext("2d");
 
-  document.getElementById("color").onchange = (event) => {
-    this.c3.style.opacity = event.target.checked ? 1 : 0;
-  };
+  document.getElementById("color").addEventListener(
+    "change",
+    (event) => {
+      this.outputColor.style.opacity = event.target.checked ? 1 : 0;
+    },
+    false
+  );
 
-  this.output = document.getElementById("output-text");
+  document.getElementById("fullscreen").addEventListener(
+    "click",
+    (event) => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.body.requestFullscreen();
+      }
+    },
+    false
+  );
+
+  this.outputText = document.getElementById("output-text");
 
   video.addEventListener(
     "play",
@@ -49,8 +66,8 @@ processor.doLoad = function doLoad() {
       this.c1.height = this.height;
       this.c2.width = this.width;
       this.c2.height = this.height;
-      this.c3.width = this.width;
-      this.c3.height = this.height;
+      this.outputColor.width = this.width;
+      this.outputColor.height = this.height;
       console.log(`Pixelated to ${this.width} x ${this.height}`);
 
       this.timerCallback();
@@ -58,12 +75,16 @@ processor.doLoad = function doLoad() {
     false
   );
 
-  video.addEventListener("seeked", () => {
-    if (this.video.paused) this.computeFrame();
-  });
+  video.addEventListener(
+    "seeked",
+    () => {
+      if (this.video.paused) this.computeFrame();
+    },
+    false
+  );
 };
 
-processor.timerCallback = function timerCallback() {
+filter.timerCallback = function timerCallback() {
   if (this.video.paused || this.video.ended) {
     return;
   }
@@ -79,12 +100,12 @@ const gammaCorrect = (value) => {
   return Math.pow((value + 0.055) / 1.055, 2.4);
 };
 
-processor.computeFrame = function computeFrame() {
+filter.computeFrame = function computeFrame() {
   this.ctx1.drawImage(this.video, 0, 0, this.width, this.height);
   const frame = this.ctx1.getImageData(0, 0, this.width, this.height);
   const data = frame.data;
 
-  this.ctx3.putImageData(frame, 0, 0);
+  this.outputColorCtx.putImageData(frame, 0, 0);
 
   let output = "";
   for (let i = 0; i < data.length; i += 4) {
@@ -109,7 +130,7 @@ processor.computeFrame = function computeFrame() {
       } else if (diff > closestDiff) {
         break;
       }
-      // TODO: early exit or binary search
+      // TODO: binary search?
     }
 
     output += closestChar;
@@ -119,7 +140,7 @@ processor.computeFrame = function computeFrame() {
   }
 
   this.ctx2.putImageData(frame, 0, 0);
-  this.output.innerText = output;
+  this.outputText.innerText = output;
 };
 
-processor.doLoad();
+filter.init();
