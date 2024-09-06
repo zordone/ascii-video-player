@@ -1,13 +1,12 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-// ctx.font = "83.25px Menlo";
 ctx.font = "900 162.7px Menlo, monospace";
 ctx.textBaseline = "bottom";
 
 // size of one character
 const { width, fontBoundingBoxAscent: height } = ctx.measureText("█");
-console.log("MEASURE", width, height);
+console.log("measure", width, height);
 
 // all the printable ASCII characters
 const chars = Array.from({ length: 224 }, (_, i) =>
@@ -64,8 +63,12 @@ document.getElementById("generate").onclick = async () => {
   const multiplier = 1 / values.at(-1).brightness;
   values.forEach((v) => (v.brightness *= multiplier));
   // output
+  const asciiRatio = width / height;
   const asciiChars = JSON.stringify(values.map((v) => v.char).join(""));
   const asciiValues = "[" + values.map((v) => v.brightness.toFixed(4)) + "]";
-  document.getElementById("output").innerText =
-    "asciiChars: " + asciiChars + ",\n" + "asciiValues: " + asciiValues + ",";
+  document.getElementById("output").innerText = [
+    `const asciiRatio = ${asciiRatio};`,
+    `const asciiChars = ${asciiChars};`,
+    `const asciiValues = ${asciiValues};`,
+  ].join("\n");
 };

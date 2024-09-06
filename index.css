@@ -60,7 +60,6 @@ canvas {
   mix-blend-mode: multiply;
   font: 900 6px "Menlo", monospace;
   white-space: preserve nowrap;
-  line-height: 1.06;
   background: #000;
   color: #fff;
 }
