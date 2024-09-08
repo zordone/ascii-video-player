@@ -1,9 +1,3 @@
-// size of one pixel
-const pixelate = 3.5; // TODO: param for setting font size, calculate pixelation from that.
-
-// more than 1.0 to boost contrast
-const contrast = 2.0;
-
 // ascii info: aspect ratio, characters to use, brightness value for each
 const asciiRatio = 0.5152913184027207;
 const asciiChars =
@@ -32,6 +26,14 @@ const asciiValues = [
   0.9052, 0.9096, 0.9179, 0.9695, 1.0,
 ];
 
+// TODO: init HTML values based on the variable values here
+// more than 1.0 to boost contrast
+let contrast = 1.5;
+
+// size of one pixel
+let pixelate = 3.5;
+
+// will be calculated after video load
 let width, height;
 
 // when we're ready to process the next frame
@@ -150,17 +152,35 @@ function processFrame() {
   outputText.innerText = output;
 }
 
+// set pixelation factor
+function onPixelChange(event) {
+  pixelate = event.target.value;
+  onLoadedData(); // TODO: only width init, instead of full re-init?
+}
+
+// set font size
+function onSizeChange(event) {
+  const size = event.target.value;
+  outputText.style.fontSize = `${size}px`;
+}
+
+// set contrast
+function onContrastChange(event) {
+  contrast = event.target.value;
+  processFrame();
+}
+
 // toggle color mode on/off
 function onColorModeChange(event) {
   outputCanvas.style.opacity = event.target.checked ? 1 : 0;
 }
 
 // toggle full screen on/off
-function onFullScreenClick() {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  } else {
+function onFullScreenChange(event) {
+  if (event.target.checked) {
     document.body.requestFullscreen();
+  } else {
+    document.exitFullscreen();
   }
 }
 
@@ -183,12 +203,18 @@ const outputCanvas = document.getElementById("output-color");
 const outputCtx = outputCanvas.getContext("2d");
 const outputText = document.getElementById("output-text");
 
+const paramPixel = document.getElementById("param-pixel");
+const paramSize = document.getElementById("param-size");
+const paramContrast = document.getElementById("param-contrast");
 const paramColor = document.getElementById("param-color");
-const paramFullscreen = document.getElementById("param-fullscreen");
+const paramFullScreen = document.getElementById("param-fullscreen");
 
 // events
+paramPixel.onchange = onPixelChange;
+paramSize.onchange = onSizeChange;
+paramContrast.onchange = onContrastChange;
 paramColor.onchange = onColorModeChange;
-paramFullscreen.onclick = onFullScreenClick;
+paramFullScreen.onchange = onFullScreenChange;
 video.onloadeddata = onLoadedData;
 video.onplay = onFrame;
 video.onseeked = processFrame;

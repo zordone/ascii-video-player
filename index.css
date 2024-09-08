@@ -33,8 +33,29 @@ canvas {
     display: flex;
     flex-direction: column;
     justify-content: end;
-    gap: 1rem;
+    gap: 0.3rem;
     width: fit-content;
+
+    div {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.3rem;
+    }
+
+    input[type="number"] {
+      width: 6ch;
+    }
+
+    input {
+      background: #f1eeee;
+      color: #505050;
+      border: 1px solid #767676;
+      border-radius: 0.3rem;
+
+      &:hover {
+        border-color: #4f4f4f;
+      }
+    }
   }
 }
 
@@ -52,10 +73,6 @@ canvas {
   height: 100%;
   opacity: 0;
   transition: opacity 100ms ease-in-out;
-
-  /* TEST */
-  /* z-index: 2;
-  opacity: 1; */
 }
 
 #output-text {
