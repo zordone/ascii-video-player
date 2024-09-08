@@ -40,7 +40,7 @@ document.getElementById("generate").onclick = async () => {
       sum += Math.max(r, g, b) / 255;
     }
     // combined brightness for the whole character
-    const brightness = sum / (width * height);
+    const brightness = Math.round((sum / (width * height)) * 1e4) / 1e4;
     // exclude duplicate brightness values
     if (set.has(brightness)) {
       console.log("exclude duplicate", brightness);

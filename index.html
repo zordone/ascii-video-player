@@ -4,16 +4,14 @@
     <meta charset="UTF-8" />
     <title>ASCII Video Player</title>
     <link rel="stylesheet" href="index.css" />
+    <link rel="shortcut icon" href="favicon.png" type="image/png" />
   </head>
 
   <body>
     <div id="grid">
       <video
         id="video"
-        src="video/BigBuckBunny.mp4"
-        _src="video/ElephantsDream.mp4"
-        _src="video/Sintel.mp4"
-        _src="video/TearsOfSteel.mp4"
+        _src="video/BigBuckBunny.mp4"
         controls
         crossorigin="anonymous"
         autofocus
@@ -22,6 +20,14 @@
       <canvas id="color"></canvas>
       <canvas id="brightness"></canvas>
       <div id="params">
+        <div>
+          <select id="param-video">
+            <option value="video/BigBuckBunny.mp4">BigBuckBunny</option>
+            <option value="video/ElephantsDream.mp4">ElephantsDream</option>
+            <option value="video/Sintel.mp4">Sintel</option>
+            <option value="video/TearsOfSteel.mp4">TearsOfSteel</option>
+          </select>
+        </div>
         <div>
           <label for="param-pixel">Pixelate:</label>
           <input
@@ -41,7 +47,7 @@
             min="1"
             max="24"
             step="0.1"
-            value="6"
+            value="6.0"
           />
         </div>
         <div>
@@ -58,10 +64,6 @@
         <div>
           <label for="param-color">Color:</label>
           <input id="param-color" type="checkbox" />
-        </div>
-        <div>
-          <label for="param-fullscreen">Full Screen:</label>
-          <input id="param-fullscreen" type="checkbox" />
         </div>
       </div>
     </div>

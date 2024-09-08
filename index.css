@@ -16,7 +16,7 @@ canvas {
 
 #grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr) 0fr;
   gap: 1rem;
   margin-bottom: 1rem;
 
@@ -46,7 +46,8 @@ canvas {
       width: 6ch;
     }
 
-    input {
+    input,
+    select {
       background: #f1eeee;
       color: #505050;
       border: 1px solid #767676;
