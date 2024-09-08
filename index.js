@@ -6,6 +6,7 @@ const asciiRatio = 0.5152913184027207;
 const asciiChars =
   " ´`¸¨·.'¯,_:°¹-\"^~²³;¬¡!¦/«»\\¤÷+|<>rº()=×¿?ª*c[]lvL7Tzstx}íìf{iç%±ï1JYj©îCn¢¼®u½oIÝFy2w¾3e4aÌÍÇ5úùVòó£kSXhüÞ§ñPöý$ÎÏZõûmµAÿôèéáàGEëæ96øäqpdbU¥ãðê#ÀÁ8K¶â&OHÈÉÂÄDÙÚÃåR0ÅÊgßËNÒÓÆQWÛÜþM@ÐBÔÖÕÑØ";
 const asciiValues = [
+  // TODO: /these\ are duplicates, should only be one
   0.0, 0.0798, 0.0798, 0.088, 0.1016, 0.1036, 0.1038, 0.1213, 0.1565, 0.158,
   0.205, 0.2073, 0.2207, 0.224, 0.2385, 0.2406, 0.2433, 0.2593, 0.26, 0.2646,
   0.2689, 0.2701, 0.2805, 0.2807, 0.2927, 0.3187, 0.3211, 0.3212, 0.3214,
@@ -175,3 +176,5 @@ paramFullscreen.onclick = onFullScreenClick;
 video.onloadeddata = onLoadedData;
 video.onplay = onFrame;
 video.onseeked = processFrame;
+
+video.currentTime = 47; // TODO: remove
