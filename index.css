@@ -52,6 +52,10 @@ canvas {
   height: 100%;
   opacity: 0;
   transition: opacity 100ms ease-in-out;
+
+  /* TEST */
+  /* z-index: 2;
+  opacity: 1; */
 }
 
 #output-text {

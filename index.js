@@ -1,6 +1,9 @@
 // size of one pixel
 const pixelate = 3.5; // TODO: param for setting font size, calculate pixelation from that.
 
+// more than 1.0 to boost contrast
+const contrast = 2.0;
+
 // ascii info: aspect ratio, characters to use, brightness value for each
 const asciiRatio = 0.5152913184027207;
 const asciiChars =
@@ -31,12 +34,6 @@ const asciiValues = [
 
 let width, height;
 
-// gamma encoded sRGB -> linear luminance
-function gammaCorrect(value) {
-  if (value <= 0.04045) return value / 12.92;
-  return Math.pow((value + 0.055) / 1.055, 2.4);
-}
-
 // when we're ready to process the next frame
 function onFrame() {
   // abort if video is not playing
@@ -57,10 +54,12 @@ function onLoadedData() {
   // update all canvases
   pixelatedCanvas.width = width;
   pixelatedCanvas.height = height;
-  luminosityCanvas.width = width;
-  luminosityCanvas.height = height;
   colorCanvas.width = width;
   colorCanvas.height = height;
+  brightnessCanvas.width = width;
+  brightnessCanvas.height = height;
+  outputCanvas.width = width;
+  outputCanvas.height = height;
   // debug info
   processFrame();
   const { videoWidth, videoHeight } = video;
@@ -75,6 +74,8 @@ function onLoadedData() {
   const actual = Math.round(outHeight);
   const error = Math.abs(actual - correct);
   console.log(`Correct: ${correct}, Actual: ${actual}, Error: ${error}`);
+  // TODO: remove
+  video.currentTime = 47;
 }
 
 // find the closest character to given brightness
@@ -106,23 +107,36 @@ function searchChar(brightness) {
 function processFrame() {
   // copy frame to canvas in reduced size to pixelate it
   pixelatedCtx.drawImage(video, 0, 0, width, height);
-  const frame = pixelatedCtx.getImageData(0, 0, width, height);
-  const data = frame.data;
-  // copy pixelated frame to background canvas for color mode
-  colorCtx.putImageData(frame, 0, 0);
-  // go over all the pixels and collect the ascii characters
+  // pixelated frame -> full brightness, color only
+  const colorFrame = pixelatedCtx.getImageData(0, 0, width, height);
+  const colorData = colorFrame.data;
+  for (let i = 0; i < colorData.length; i += 4) {
+    const r = colorData[i + 0];
+    const g = colorData[i + 1];
+    const b = colorData[i + 2];
+    const max = Math.max(r, g, b, 0.01);
+    const multiplier = 255 / max;
+    colorData[i + 0] = r * multiplier;
+    colorData[i + 1] = g * multiplier;
+    colorData[i + 2] = b * multiplier;
+  }
+  colorCtx.putImageData(colorFrame, 0, 0);
+  outputCtx.putImageData(colorFrame, 0, 0);
+  // pixelated frame -> brightness only -> ascii characters
+  const brightnessFrame = pixelatedCtx.getImageData(0, 0, width, height);
+  const brightnessData = brightnessFrame.data;
   let output = "";
-  for (let i = 0; i < data.length; i += 4) {
-    // brightness, based on gamma corrected, linear luminance value
-    const r = gammaCorrect(data[i + 0] / 255);
-    const g = gammaCorrect(data[i + 1] / 255);
-    const b = gammaCorrect(data[i + 2] / 255);
+  for (let i = 0; i < brightnessData.length; i += 4) {
+    // brightness
+    const r = (brightnessData[i + 0] / 255) ** contrast;
+    const g = (brightnessData[i + 1] / 255) ** contrast;
+    const b = (brightnessData[i + 2] / 255) ** contrast;
     const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
     // replace pixel with the brightness value just for debug visualisation
     const scaled = brightness * 255;
-    data[i + 0] = scaled;
-    data[i + 1] = scaled;
-    data[i + 2] = scaled;
+    brightnessData[i + 0] = scaled;
+    brightnessData[i + 1] = scaled;
+    brightnessData[i + 2] = scaled;
     // find ascii character with the closest brightness
     output += searchChar(brightness);
     // new line?
@@ -131,14 +145,14 @@ function processFrame() {
     }
   }
   // draw to the luminosity canvas
-  luminosityCtx.putImageData(frame, 0, 0);
+  brightnessCtx.putImageData(brightnessFrame, 0, 0);
   // update the ascii output
   outputText.innerText = output;
 }
 
 // toggle color mode on/off
 function onColorModeChange(event) {
-  colorCanvas.style.opacity = event.target.checked ? 1 : 0;
+  outputCanvas.style.opacity = event.target.checked ? 1 : 0;
 }
 
 // toggle full screen on/off
@@ -159,16 +173,18 @@ const pixelatedCtx = pixelatedCanvas.getContext("2d", {
   willReadFrequently: true,
 });
 
-const luminosityCanvas = document.getElementById("luminosity");
-const luminosityCtx = luminosityCanvas.getContext("2d");
-
-const colorCanvas = document.getElementById("output-color");
+const colorCanvas = document.getElementById("color");
 const colorCtx = colorCanvas.getContext("2d");
 
-const paramColor = document.getElementById("color");
-const paramFullscreen = document.getElementById("fullscreen");
+const brightnessCanvas = document.getElementById("brightness");
+const brightnessCtx = brightnessCanvas.getContext("2d");
 
+const outputCanvas = document.getElementById("output-color");
+const outputCtx = outputCanvas.getContext("2d");
 const outputText = document.getElementById("output-text");
+
+const paramColor = document.getElementById("param-color");
+const paramFullscreen = document.getElementById("param-fullscreen");
 
 // events
 paramColor.onchange = onColorModeChange;
@@ -176,5 +192,3 @@ paramFullscreen.onclick = onFullScreenClick;
 video.onloadeddata = onLoadedData;
 video.onplay = onFrame;
 video.onseeked = processFrame;
-
-video.currentTime = 47; // TODO: remove
