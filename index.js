@@ -24,7 +24,6 @@ const asciiValues = [
   0.9694, 1.0,
 ];
 
-// TODO: init HTML values based on the variable values here
 // more than 1.0 to boost contrast
 let contrast = 1.5;
 
@@ -74,8 +73,6 @@ function onLoadedData() {
   const actual = Math.round(outHeight);
   const error = Math.abs(actual - correct);
   console.log(`Correct: ${correct}, Actual: ${actual}, Error: ${error}`);
-  // TODO: remove
-  video.currentTime = 47;
 }
 
 // find the closest character to given brightness
@@ -114,7 +111,8 @@ function processFrame() {
     const r = colorData[i + 0];
     const g = colorData[i + 1];
     const b = colorData[i + 2];
-    const max = Math.max(r, g, b, 0.01);
+    // approximation of: RGB -> HSV -> V=100% -> RGB
+    const max = Math.max(r, g, b, 1);
     const multiplier = 255 / max;
     colorData[i + 0] = r * multiplier;
     colorData[i + 1] = g * multiplier;
@@ -158,7 +156,7 @@ function onVideoChange() {
 // set pixelation factor
 function onPixelChange(event) {
   pixelate = event.target.value;
-  onLoadedData(); // TODO: only width init, instead of full re-init?
+  onLoadedData();
 }
 
 // set font size
