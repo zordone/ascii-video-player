@@ -8,6 +8,10 @@ This is a POC for rendering a video as ASCII art.
 - Choses the ASCII character closest to the brightness value of each pixel.
 - Puts the color values on a canvas behind the text for the color mode.
 
+## Demo
+
+Feel free to try the [live demo](https://zordone.github.io/ascii-video-player/).
+
 ## Pages
 
 - The `index` page is the actual player.
@@ -15,13 +19,11 @@ This is a POC for rendering a video as ASCII art.
 
 ## Test videos
 
-The test videos are not included.
+Only one (online) test video is included.
 
-- You can put your own videos in the `video` folder,
-- Or download some from [here](https://gist.github.com/jsturgis/3b19447b304616f18657), for example [BigBuckBunny.mp4](http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4).
-- Or switch to using online videos.
+You can simply add more (local or online) in the HTML.
 
-You might need to adjust the `option` elements accordingly in `index.html`.
+You can find some examples [here](https://gist.github.com/jsturgis/3b19447b304616f18657).
 
 ## Screenshots
 

@@ -9,13 +9,25 @@
 
   <body>
     <div id="grid">
-      <video id="video" controls crossorigin="anonymous" autofocus></video>
-      <canvas id="pixelated"></canvas>
-      <canvas id="color"></canvas>
-      <canvas id="brightness"></canvas>
+      <video
+        id="video"
+        controls
+        crossorigin="anonymous"
+        autofocus
+        autoplay
+        title="Original"
+      ></video>
+      <canvas id="pixelated" title="Pixelated"></canvas>
+      <canvas id="color" title="Color"></canvas>
+      <canvas id="brightness" title="Brightness"></canvas>
       <div id="params">
         <div>
           <select id="param-video">
+            <option
+              value="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            >
+              BigBuckBunny (Online)
+            </option>
             <option value="video/BigBuckBunny.mp4">BigBuckBunny</option>
             <option value="video/ElephantsDream.mp4">ElephantsDream</option>
             <option value="video/Sintel.mp4">Sintel</option>
@@ -57,7 +69,7 @@
         </div>
         <div>
           <label for="param-color">Color:</label>
-          <input id="param-color" type="checkbox" />
+          <input id="param-color" type="checkbox" checked />
         </div>
       </div>
     </div>

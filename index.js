@@ -211,5 +211,8 @@ video.onloadeddata = onLoadedData;
 video.onplay = onFrame;
 video.onseeked = processFrame;
 
+// init params
+outputCanvas.style.opacity = paramColor.checked ? 1 : 0;
+
 // load video
 onVideoChange();
